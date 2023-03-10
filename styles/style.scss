@@ -1,0 +1,102 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;1,700&display=swap");
+@import "./utilities";
+
+$primaryColor: steelblue;
+$border: 3px solid black;
+$boxSize: 80px;
+$pieceSize: $boxSize - 20px;
+$circleSize: $pieceSize - 30px;
+$lightSquareColor: rgb(238, 152, 121);
+$darkSquareColor: rgba(199, 10, 10, 0.781);
+$lightHighlightColor: rgb(223, 230, 130);
+$darkHighlightColor: rgba(199, 186, 10, 0.781);
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+}
+
+body {
+  font-family: "Roboto", serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: steelblue;
+}
+
+.board {
+  .piece {
+    @extend .flex-center;
+    height: $pieceSize;
+    width: $pieceSize;
+    border-radius: 50%;
+
+    i {
+      font-size: 27px;
+      background-color: transparent;
+      -webkit-text-stroke: 2px black;
+    }
+
+    .circle {
+      height: $circleSize;
+      width: $circleSize;
+      border-radius: 50%;
+    }
+
+    .black-border {
+      border: $border;
+    }
+
+    .white-border {
+      border: $border;
+      border-color: $white;
+    }
+  }
+
+  .square {
+    height: $boxSize;
+    width: $boxSize;
+
+    border: $border;
+    @extend .flex-center;
+
+    &.hover {
+      filter: brightness(0.7);
+    }
+  }
+
+  .row:nth-child(2n) {
+    .square:nth-child(2n + 1) {
+      background-color: $darkSquareColor;
+      &.highlight {
+        background-color: $darkHighlightColor;
+      }
+    }
+    .square:nth-child(2n) {
+      background-color: $lightSquareColor;
+      &.highlight {
+        background-color: $lightHighlightColor;
+      }
+    }
+  }
+
+  .row:nth-child(2n + 1) {
+    .square:nth-child(2n + 1) {
+      background-color: $lightSquareColor;
+      &.highlight {
+        background-color: $lightHighlightColor;
+      }
+    }
+    .square:nth-child(2n) {
+      background-color: $darkSquareColor;
+      &.highlight {
+        background-color: $darkHighlightColor;
+      }
+    }
+  }
+}

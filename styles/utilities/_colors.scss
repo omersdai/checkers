@@ -1,0 +1,119 @@
+//////////////////////////////////
+// Colors
+//////////////////////////////////
+$pink: rgb(228, 101, 122);
+$red: rgb(255, 41, 41);
+$orange: rgb(255, 166, 0);
+$yellow: rgb(255, 255, 0);
+$green: rgb(61, 216, 61);
+$blue: rgb(0, 191, 255);
+$purple: rgb(161, 68, 173);
+$darkBlue: rgb(60, 60, 192);
+$black: rgb(27, 27, 27);
+$white: rgb(236, 236, 236);
+$gray: rgb(128, 128, 128);
+
+// @include set-background($color);
+
+@function set-text-color($bg-color) {
+  @if (lightness($bg-color) > 55) {
+    @return #000;
+  } @else {
+    @return #fff;
+  }
+}
+
+// Set background & text color
+// @include set-background($color)
+@mixin set-background($color) {
+  background-color: $color;
+  color: set-text-color($color);
+}
+
+.bg-pink {
+  background-color: $pink !important;
+}
+
+.bg-red {
+  background-color: $red !important;
+}
+
+.bg-orange {
+  background-color: $orange !important;
+}
+
+.bg-yellow {
+  background-color: $yellow !important;
+}
+
+.bg-green {
+  background-color: $green !important;
+}
+
+.bg-blue {
+  background-color: $blue !important;
+}
+
+.bg-purple {
+  background-color: $purple !important;
+}
+
+.bg-dark-blue {
+  background-color: $darkBlue !important;
+}
+
+.bg-black {
+  background-color: $black !important;
+}
+
+.bg-white {
+  background-color: $white !important;
+}
+
+.bg-gray {
+  background-color: $gray !important;
+}
+
+.pink {
+  color: $pink !important;
+}
+
+.red {
+  color: $red !important;
+}
+
+.orange {
+  color: $orange !important;
+}
+
+.yellow {
+  color: $yellow !important;
+}
+
+.green {
+  color: $green !important;
+}
+
+.blue {
+  color: $blue !important;
+}
+
+.purple {
+  color: $purple !important;
+}
+
+.dark-blue {
+  color: $darkBlue !important;
+}
+
+.black {
+  color: $black !important;
+}
+
+.white {
+  color: $white !important;
+}
+
+.gray {
+  color: $gray !important;
+}

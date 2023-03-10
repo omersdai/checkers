@@ -1,0 +1,97 @@
+//////////////////////////////////
+// HTML Classes
+//////////////////////////////////
+
+// @extend .flex-center;
+
+.hide {
+  display: none !important;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+%btn {
+  font-size: 15px;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:active {
+    transform: scale(95%);
+  }
+
+  &:hover {
+    filter: brightness(0.95);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+%input {
+  font-size: 23px;
+  border-radius: 5px;
+  padding: 5px 10px;
+}
+
+//////////////////////////////////
+// Positioning
+//////////////////////////////////
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+//////////////////////////////////
+// Change HTML Elements
+//////////////////////////////////
+// https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/
+%force-word-wrap {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  // word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+// Remove number input arrows/spinners
+// https://www.w3schools.com/howto/howto_css_hide_arrow_number.asp
+%input-remove-arrows {
+  /* Chrome, Safari, Edge, Opera */
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  /* Firefox */
+  &[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
