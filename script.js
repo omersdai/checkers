@@ -50,6 +50,63 @@ function startGame() {
   computeAllPieceMoves(startingColor);
 }
 
+function movePiece(pieceEl, to) {
+  const from = pieceIdx(pieceEl);
+  const [x1, y1] = getCoor(from);
+  const [x2, y2] = getCoor(to);
+  const { board } = checkersGame;
+  const piece = board[x1][y1];
+  const { color, isKing, moves } = piece;
+
+  if ((color === BLACK) !== isBlackTurn) return;
+  const move = moves.filter((move) => move.to === to)[0];
+  if (!move) return;
+
+  console.log(piece);
+  // Move piece
+  board[x2][y2] = board[x1][y1];
+  board[x1][y1] = null;
+  movePieceEl(x2, y2, pieceEl);
+  highlightMove(from, to);
+
+  const oppositeColor = isBlackTurn ? WHITE : BLACK;
+
+  if (
+    !isKing &&
+    ((isBlackTurn && x2 === 0) || (!isBlackTurn && x2 === boardSize - 1))
+  ) {
+    piece.isKing = true;
+    promotePiece(pieceEl);
+  }
+
+  if (!move.capturedIdx) {
+    isBlackTurn = !isBlackTurn;
+    computeAllPieceMoves(oppositeColor);
+    return;
+  }
+
+  // Capture piece
+  const [x3, y3] = getCoor(move.capturedIdx);
+  board[x3][y3] = null;
+  htmlBoard[x3][y3].innerHTML = "";
+
+  const comboMoves = computeMoves(to).filter(
+    (move) => move.capturedIdx !== null
+  );
+  console.log(comboMoves);
+  if (comboMoves.length === 0) {
+    isBlackTurn = !isBlackTurn;
+    computeAllPieceMoves(oppositeColor);
+  } else {
+    // Remove all other moves but the combo moves
+    collectPieces(color).forEach((idx) => {
+      const [x, y] = getCoor(idx);
+      checkersGame.board[x][y].moves = [];
+    });
+    board[x2][y2].moves = comboMoves;
+  }
+}
+
 function computeAllPieceMoves(color) {
   collectPieces(color).forEach((idx) => {
     const [x, y] = getCoor(idx);
@@ -104,50 +161,6 @@ function computeMove(x1, y1, dir, color) {
   return move;
 }
 
-function movePiece(pieceEl, to) {
-  const from = pieceIdx(pieceEl);
-  const [x1, y1] = getCoor(from);
-  const [x2, y2] = getCoor(to);
-  const { board } = checkersGame;
-  const { color, moves } = board[x1][y1];
-
-  if ((color === BLACK) !== isBlackTurn) return;
-  const move = moves.filter((move) => move.to === to)[0];
-  if (!move) return;
-
-  // Move piece
-  board[x2][y2] = board[x1][y1];
-  board[x1][y1] = null;
-  movePieceEl(x2, y2, pieceEl);
-  highlightMove(from, to);
-
-  const oppositeColor = isBlackTurn ? WHITE : BLACK;
-
-  if (!move.capturedIdx) {
-    isBlackTurn = !isBlackTurn;
-    computeAllPieceMoves(oppositeColor);
-    return;
-  }
-
-  // Capture piece
-  const [x3, y3] = getCoor(move.capturedIdx);
-  board[x3][y3] = null;
-  htmlBoard[x3][y3].innerHTML = "";
-
-  const comboMoves = computeMoves(to);
-  if (comboMoves.length === 0) {
-    isBlackTurn = !isBlackTurn;
-    computeAllPieceMoves(oppositeColor);
-  } else {
-    // Remove all other moves but the combo moves
-    collectPieces(color).forEach((idx) => {
-      const [x, y] = getCoor(idx);
-      checkersGame.board[x][y].moves = [];
-    });
-    board[x2][y2].moves = comboMoves;
-  }
-}
-
 function computeAllPieceMoves(color) {
   const pieceIndices = collectPieces(color);
   let canJump = false;
@@ -182,6 +195,11 @@ function collectPieces(color) {
   return allyPieces;
 }
 
+function promotePiece(pieceEl) {
+  const oppositeColor = pieceEl.getAttribute("color") === BLACK ? WHITE : BLACK;
+  pieceEl.innerHTML = `<i class="fa-solid fa-crown ${oppositeColor}"></i>`;
+}
+
 function clearBoard() {
   const board = [];
   for (let i = 0; i < boardSize; i++) {
@@ -196,48 +214,43 @@ function clearBoard() {
 }
 
 function placePieces() {
-  const isKing = false;
   for (let i = 0; i < boardSize; i += 2) {
-    createPiece(0, i + 1, WHITE, isKing);
-    createPiece(1, i, WHITE, isKing);
-    createPiece(2, i + 1, WHITE, isKing);
+    createPiece(0, i + 1, WHITE);
+    createPiece(1, i, WHITE);
+    createPiece(2, i + 1, WHITE);
 
-    createPiece(7, i, BLACK, isKing);
-    createPiece(6, i + 1, BLACK, isKing);
-    createPiece(5, i, BLACK, isKing);
+    createPiece(7, i, BLACK);
+    createPiece(6, i + 1, BLACK);
+    createPiece(5, i, BLACK);
   }
 }
 
-function createPiece(x, y, color, isKing) {
+function createPiece(x, y, color) {
   const piece = {
     color,
-    isKing,
+    isKing: false,
     moves: null,
   };
 
   checkersGame.board[x][y] = piece;
 
   const square = htmlBoard[x][y];
-  const pieceEl = createPieceEl(x, y, color, isKing);
+  const pieceEl = createPieceEl(x, y, color);
   square.appendChild(pieceEl);
 }
 
-function createPieceEl(x, y, color, isKing) {
+function createPieceEl(x, y, color) {
   const pieceEl = document.createElement("div");
   const oppositeColor = color === BLACK ? WHITE : BLACK;
   pieceEl.className = `piece bg-${color}`;
   pieceEl.draggable = true;
-  pieceEl.innerHTML = isKing
-    ? `<i class="fa-solid fa-crown ${oppositeColor}"></i>`
-    : `<div class="circle ${oppositeColor}-border"></div>`;
+  pieceEl.innerHTML = `<div class="circle ${oppositeColor}-border"></div>`;
 
   pieceEl.setAttribute("square", getIdx(x, y));
   pieceEl.setAttribute("color", color);
   pieceEl.addEventListener("dragstart", dragStart);
   pieceEl.addEventListener("dragend", dragEnd);
-  pieceEl.addEventListener("click", () => {
-    console.log(checkersGame.board[x][y].moves);
-  });
+  pieceEl.addEventListener("click", onClick);
 
   return pieceEl;
 }
@@ -260,10 +273,8 @@ function initiliazeGame() {
     .forEach((row) =>
       htmlBoard.push(Array.from(row.querySelectorAll(".square")))
     );
-  console.log(htmlBoard);
 
   addSquareEventListeners();
-
   startGame();
 }
 
@@ -278,31 +289,46 @@ function dragEnd(e) {
   draggedPiece = null;
 }
 
+function onClick(e) {
+  const idx = pieceIdx(e.currentTarget);
+  const [x, y] = getCoor(idx);
+  const { moves } = checkersGame.board[x][y];
+
+  if (moves) console.log(moves);
+}
+
 function addSquareEventListeners() {
   squares.forEach((square, idx) => {
-    square.addEventListener("dragenter", (e) => {
-      if (!draggedPiece) return;
-      e.currentTarget.classList.add("hover");
-    });
+    square.setAttribute("index", idx);
 
-    square.addEventListener("dragleave", (e) => {
-      if (!draggedPiece) return;
-      e.currentTarget.classList.remove("hover");
-    });
-
-    square.addEventListener("drop", (e) => {
-      e.preventDefault();
-      if (!draggedPiece) return;
-      e.currentTarget.classList.remove("hover");
-
-      movePiece(draggedPiece, idx);
-    });
-
+    square.addEventListener("dragenter", dragEnter);
+    square.addEventListener("dragleave", dragLeave);
+    square.addEventListener("drop", drop);
     // Dragging is not enabled by default
-    square.addEventListener("dragover", (e) => {
-      e.preventDefault();
-    });
+    square.addEventListener("dragover", dragOver);
   });
+}
+
+function dragEnter(e) {
+  if (!draggedPiece) return;
+  e.currentTarget.classList.add("hover");
+}
+
+function dragLeave(e) {
+  if (!draggedPiece) return;
+  e.currentTarget.classList.remove("hover");
+}
+
+function drop(e) {
+  e.preventDefault();
+  if (!draggedPiece) return;
+  e.currentTarget.classList.remove("hover");
+  const idx = parseInt(e.currentTarget.getAttribute("index"));
+  movePiece(draggedPiece, idx);
+}
+
+function dragOver(e) {
+  e.preventDefault();
 }
 
 function pieceIdx(pieceEl) {
